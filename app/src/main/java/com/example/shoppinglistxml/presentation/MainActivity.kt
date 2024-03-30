@@ -1,7 +1,6 @@
 package com.example.shoppinglistxml.presentation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
