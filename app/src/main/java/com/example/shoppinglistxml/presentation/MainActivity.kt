@@ -1,5 +1,6 @@
 package com.example.shoppinglistxml.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +11,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglistxml.R
+import com.example.shoppinglistxml.presentation.ShopItemActivity.Companion.EXTRA_SCREEN_MODE
+import com.example.shoppinglistxml.presentation.ShopItemActivity.Companion.MODE_ADD
+import com.example.shoppinglistxml.presentation.ShopItemActivity.Companion.MODE_EDIT
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +34,13 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
             shopListAdapter.submitList(it)
+        }
+
+        val buttonAddItem = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
+        buttonAddItem.setOnClickListener{
+            val intent = Intent(this, ShopItemActivity::class.java)
+            intent.putExtra(EXTRA_SCREEN_MODE, MODE_ADD)
+            startActivity(intent)
         }
     }
 
@@ -80,6 +92,9 @@ class MainActivity : AppCompatActivity() {
     private fun setupClickListener() {
         shopListAdapter.onShopItemClickListener = {
             Log.d("OnClickListener", it.toString())
+            val intent = Intent(this, ShopItemActivity::class.java)
+            intent.putExtra(EXTRA_SCREEN_MODE, MODE_EDIT)
+            startActivity(intent)
         }
     }
 
