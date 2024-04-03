@@ -44,8 +44,9 @@ class ShopItemViewModel : ViewModel() {
         if (validateInput(name, count)) {
             val shopItem = ShopItem(name, count, true)
             addShopItemUseCase.addShopItem(shopItem)
+
+            finishWork()
         }
-        finishWork()
     }
 
     fun editShopItem(inputName: String?, inputCount: String?) {
@@ -55,6 +56,7 @@ class ShopItemViewModel : ViewModel() {
             _shopItem.value?.let {
                 val item = it.copy(name = name, count = count)
                 editShopItemUseCase.editShopItem(item)
+
                 finishWork()
             }
         }
@@ -85,11 +87,11 @@ class ShopItemViewModel : ViewModel() {
         return result
     }
 
-    public fun resetErrorInputName() {
+    fun resetErrorInputName() {
         _errorInputName.value = false
     }
 
-    public fun resetErrorInputCount() {
+    fun resetErrorInputCount() {
         _errorInputCount.value = false
     }
 
