@@ -8,6 +8,9 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.shoppinglistxml.R
 
 class ShopItemActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: ShopItemViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
