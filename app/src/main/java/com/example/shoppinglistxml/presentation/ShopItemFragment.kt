@@ -3,12 +3,15 @@ package com.example.shoppinglistxml.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.shoppinglistxml.R
 import com.example.shoppinglistxml.domain.ShopItem
 import com.google.android.material.textfield.TextInputLayout
@@ -17,7 +20,7 @@ import com.google.android.material.textfield.TextInputLayout
 class ShopItemFragment(
     private val screenMode: String = MODE_UNKNOWN,
     private val shopItemID: Int = ShopItem.UNDEFINED_ID
-): Fragment() {
+) : Fragment() {
 
     private lateinit var viewModel: ShopItemViewModel
 
@@ -26,8 +29,6 @@ class ShopItemFragment(
     private lateinit var etName: EditText
     private lateinit var etCount: EditText
     private lateinit var buttonSave: Button
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,15 +43,14 @@ class ShopItemFragment(
 
         parseParams()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
-        initViews()
+        initViews(view)
         addTextChangeListeners()
         launchRightMode()
         observeViewModel()
     }
 
-
-        private fun observeViewModel() {
-        viewModel.errorInputCount.observe(this) {
+    private fun observeViewModel() {
+        viewModel.errorInputCount.observe(viewLifecycleOwner) {
             val message = if (it) {
                 getString(R.string.error_input_count)
             } else {
@@ -59,7 +59,7 @@ class ShopItemFragment(
             tilCount.error = message
         }
 
-        viewModel.errorInputName.observe(this) {
+        viewModel.errorInputName.observe(viewLifecycleOwner) {
             val message = if (it) {
                 getString(R.string.error_input_name)
             } else {
@@ -68,8 +68,8 @@ class ShopItemFragment(
             tilName.error = message
         }
 
-        viewModel.shouldCloseScreen.observe(this) {
-            finish()
+        viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
+            activity?.onBackPressed() // requireActivity() when sure non-null
         }
     }
 
@@ -82,7 +82,12 @@ class ShopItemFragment(
 
     private fun addTextChangeListeners() {
         etName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
 
             }
 
@@ -96,7 +101,12 @@ class ShopItemFragment(
 
         })
         etCount.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
 
             }
 
@@ -113,7 +123,7 @@ class ShopItemFragment(
 
     private fun launchEditMode() {
         viewModel.getShopItem(shopItemID)
-        viewModel.shopItem.observe(this) {
+        viewModel.shopItem.observe(viewLifecycleOwner) {
             etName.setText(it.name)
             etCount.setText(it.count.toString())
         }
@@ -137,12 +147,12 @@ class ShopItemFragment(
         }
     }
 
-    private fun initViews() {
-        tilName = findViewById(R.id.til_name)
-        tilCount = findViewById(R.id.til_count)
-        etName = findViewById(R.id.et_name)
-        etCount = findViewById(R.id.et_count)
-        buttonSave = findViewById(R.id.save_button)
+    private fun initViews(view: View) {
+        tilName = view.findViewById(R.id.til_name)
+        tilCount = view.findViewById(R.id.til_count)
+        etName = view.findViewById(R.id.et_name)
+        etCount = view.findViewById(R.id.et_count)
+        buttonSave = view.findViewById(R.id.save_button)
     }
 
     companion object {
@@ -151,6 +161,14 @@ class ShopItemFragment(
         private const val MODE_EDIT = "mode_edit"
         private const val MODE_ADD = "mode_add"
         private const val MODE_UNKNOWN = ""
+
+        fun newInstanceAddItem(): ShopItemFragment {
+            return ShopItemFragment(MODE_ADD)
+        }
+
+        fun newInstanceEditItem(shopItemID: Int): ShopItemFragment {
+            return ShopItemFragment(MODE_EDIT, shopItemID)
+        }
 
         fun newIntentAddItem(context: Context): Intent {
             val intent = Intent(context, ShopItemActivity::class.java)
