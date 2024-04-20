@@ -2,10 +2,13 @@ package com.example.shoppinglistxml.presentation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import com.example.shoppinglistxml.R
 import com.example.shoppinglistxml.domain.ShopItem
 import androidx.recyclerview.widget.ListAdapter
 import com.example.shoppinglistxml.databinding.ItemShopDisabledBinding
+import com.example.shoppinglistxml.databinding.ItemShopEnabledBinding
 
 class ShopListAdapter :
     ListAdapter<ShopItem, ShopItemViewHolder>(
@@ -23,8 +26,9 @@ class ShopListAdapter :
             else -> throw RuntimeException("Unknown viewType: $viewType")
         }
 
-        val binding = ItemShopDisabledBinding.inflate(
+        val binding = DataBindingUtil.inflate<ViewDataBinding>(
             LayoutInflater.from(parent.context),
+            layout,
             parent,
             false
         )
@@ -34,8 +38,14 @@ class ShopListAdapter :
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
         val shopItem = getItem(position)
         val binding = holder.binding
-        binding.tvName.text = shopItem.name
-        binding.tvCount.text = shopItem.count.toString()
+        when (binding) {
+            is ItemShopDisabledBinding -> {
+                binding.shopItem = shopItem
+            }
+            is ItemShopEnabledBinding -> {
+                binding.shopItem = shopItem
+            }
+        }
 
         binding.root.setOnLongClickListener {
             onShopItemLongClickListener?.invoke(shopItem)
