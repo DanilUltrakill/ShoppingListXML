@@ -1,13 +1,11 @@
 package com.example.shoppinglistxml.data
 
 import android.app.Application
+import android.view.animation.Transformation
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import com.example.shoppinglistxml.domain.ShopItem
 import com.example.shoppinglistxml.domain.ShopListRepository
-import kotlin.random.Random
 
 class ShopListRepositoryImpl(application: Application): ShopListRepository {
 
@@ -31,9 +29,7 @@ class ShopListRepositoryImpl(application: Application): ShopListRepository {
         return mapper.mapDbModelToEntity(dbModel)
     }
 
-    override fun getShopList(): LiveData<List<ShopItem>> = MediatorLiveData<List<ShopItem>>().apply {
-        addSource(shopListDao.getShopList()) {
-            value = mapper.mapListDbModelToListEntity(it)
-        }
+    override fun getShopList(): LiveData<List<ShopItem>> = shopListDao.getShopList().map {
+        mapper.mapListDbModelToListEntity(it)
     }
 }
